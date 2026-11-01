@@ -11,6 +11,7 @@ import asyncio
 import json
 import socket
 import threading
+import urllib.request
 import uuid
 from collections.abc import Iterator
 from dataclasses import dataclass, field
@@ -94,6 +95,18 @@ def stub_server() -> Iterator[StubServer]:
     thread.join()
 
 
+class StampingHandler(urllib.request.BaseHandler):
+    """A caller's own handler: it stamps every request it sees, so the server can tell."""
+
+    def __init__(self, stamp: str) -> None:
+        self.stamp = stamp
+
+    def http_request(self, request: urllib.request.Request) -> urllib.request.Request:
+        request.add_unredirected_header("X-Stamp", self.stamp)
+
+        return request
+
+
 def find_closed_port() -> int:
     with socket.socket() as probe:
         probe.bind(("127.0.0.1", 0))
@@ -126,6 +139,23 @@ class TestRESTFulApiFactoryClient:
         assert actual_request.headers["X-Random"] == random_header_value
         assert "User-Agent" not in actual_request.headers
         assert json.loads(actual_request.body) == input_content
+
+    def test_should_post_content_through_the_supplied_opener(
+        self,
+        stub_server: StubServer) -> None:
+
+        # given
+        random_stamp = create_random_string()
+        input_opener = urllib.request.build_opener(StampingHandler(random_stamp))
+        stub_server.response.body = b"{}"
+
+        client = RESTFulApiFactoryClient(base_url=stub_server.url, opener=input_opener)
+
+        # when
+        asyncio.run(client.post_content("/tests", create_random_content()))
+
+        # then
+        assert stub_server.requests[0].headers["X-Stamp"] == random_stamp
 
     def test_should_drop_the_last_segment_of_a_base_url_without_a_trailing_slash(
         self,
