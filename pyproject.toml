@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "restfulsense"
+version = "1.0.0.0"
+description = "One exception per HTTP status, problem details as data: the Python port of The Standard's RESTFulSense library."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "LicenseRef-TSSL-1.1"
+license-files = ["LICENSE.txt"]
+authors = [{ name = "Hassan Habib", email = "hassanhabib@live.com" }]
+keywords = ["http", "rest", "exceptions", "problem-details", "the-standard"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Typing :: Typed",
+]
+dependencies = ["xeption>=1.0.0.0"]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[project.urls]
+Homepage = "https://github.com/hassanhabib/RESTFulSense-Python"
+"C# Library" = "https://github.com/hassanhabib/RESTFulSense"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+restfulsense = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
