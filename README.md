@@ -31,6 +31,21 @@ address without a trailing slash drops its last segment. The content goes as com
 `Content-Type: application/json; charset=utf-8`; the response is returned as parsed JSON, or `{}`
 for an empty body. The request runs on a worker thread, so the event loop is never blocked.
 
+The opener is the transport, as the `HttpClient` is in C#. A caller that owns its handler (a
+proxy, a recorder, a test double) hands over an opener built on it, and every request goes through
+it:
+
+```python
+import urllib.request
+
+client = RESTFulApiFactoryClient(
+    base_url="https://api.example.com/v1/",
+    opener=urllib.request.build_opener(my_handler))
+```
+
+Without one, the client builds a bare opener that sends no `User-Agent`, as `HttpClient` sends none
+of its own.
+
 ## Failing responses
 
 A failing status raises the exception for that status, carrying `status_code` and `content`:
