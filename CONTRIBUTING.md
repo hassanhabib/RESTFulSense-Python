@@ -25,10 +25,7 @@ A behaviour ported from the C# library cites the C# test it mirrors in its pull 
 
 ## Tests
 
-Until `xeption` is on PyPI, install it from its repository first:
-
 ```bash
-python -m pip install "xeption @ git+https://github.com/hassanhabib/Xeption-Python@main"
 python -m pip install -e ".[test]"
 python -m pytest -q
 ```
